@@ -27,7 +27,7 @@ function App() {
                 <NavigationBar isLoggedIn={isLoggedIn} currentUser={currentUser} onLogout={handleLogout} />
                 <main className="app-main">
                     <Routes>
-                        <Route path="/" element={<HomePage />} />
+                        <Route path="/" element={<HomePage isLoggedIn={isLoggedIn} />} />
                         <Route path="/register" element={<RegisterForm />} />
                         <Route path="/login" element={<LoginForm onLogin={handleLogin} />} />
                         <Route
