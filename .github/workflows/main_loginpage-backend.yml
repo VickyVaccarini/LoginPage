@@ -1,4 +1,4 @@
-name: Build and Deploy Gradle App to Azure Web App - loginpage-backend-qa
+name: Build and Deploy Gradle App to Azure Web App - loginpage-backend
 
 on:
   push:
