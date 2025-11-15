@@ -57,12 +57,14 @@ jobs:
     environment:
       name: production
       url: https://loginpage-backend-prod.azurewebsites.net
+
     steps:
       - name: Esperar aprobación manual
         uses: trstringer/manual-approval@v1
         with:
           approvers: VickyVaccarini
-          instructions: "Aprobar para desplegar en producción"
+          issue-title: "Aprobación requerida para desplegar en producción"
+          issue-body: "Por favor aprobar para desplegar el backend en PROD."
 
       - name: Descargar artefacto compilado
         uses: actions/download-artifact@v4
