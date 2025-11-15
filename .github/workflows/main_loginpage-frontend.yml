@@ -1,4 +1,4 @@
-name: Build and Deploy React App to Azure Web App - loginpage-frontend-qa
+name: Build and Deploy React App to Azure Web App - loginpage-frontend
 
 on:
   push:
@@ -18,18 +18,18 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        working-directory: frontend
+        working-directory: demo-project1-loginpage/frontend
         run: npm ci
 
       - name: Build React app
-        working-directory: frontend
+        working-directory: demo-project1-loginpage/frontend
         run: npm run build
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: react-app
-          path: frontend/build
+          path: demo-project1-loginpage/frontend/build
 
   deploy_qa:
     runs-on: ubuntu-latest
@@ -45,9 +45,8 @@ jobs:
         with:
           app-name: loginpage-frontend-qa
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_FRONT_QA }}
-          package: .
+          package: ./build
 
-#PROD
   deploy_prod:
     runs-on: ubuntu-latest
     needs: deploy_qa
@@ -71,4 +70,4 @@ jobs:
         with:
           app-name: loginpage-frontend-prod
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_FRONT_PROD }}
-          package: .
+          package: ./build
