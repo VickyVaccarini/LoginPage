@@ -28,7 +28,7 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: react-app
+          name: build
           path: demo-project1-loginpage/frontend/build
 
   deploy_qa:
@@ -38,14 +38,14 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: react-app
+          name: build
 
       - name: Deploy to Azure Web App (QA)
         uses: azure/webapps-deploy@v3
         with:
           app-name: loginpage-frontend-qa
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_FRONT_QA }}
-          package: react-app/demo-project1-loginpage/frontend/build
+          package: build
 
   deploy_prod:
     runs-on: ubuntu-latest
