@@ -45,7 +45,7 @@ jobs:
         with:
           app-name: loginpage-frontend-qa
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_FRONT_QA }}
-          package: react-app/build
+          package: react-app/demo-project1-loginpage/frontend/build
 
   deploy_prod:
     runs-on: ubuntu-latest
@@ -70,4 +70,4 @@ jobs:
         with:
           app-name: loginpage-frontend-prod
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_FRONT_PROD }}
-          package: react-app/build
+          package: react-app/demo-project1-loginpage/frontend/build
