@@ -25,13 +25,13 @@ jobs:
       - name: Build with Gradle
         run: |
           cd demo-project1-loginpage
-          ./gradlew clean build -x test
+          ./gradlew clean bootJar -x test
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: java-app
-          path: demo-project1-loginpage/build/libs/*.jar
+          path: demo-project1-loginpage/build/libs/loginpage-backend.jar
 
   deploy:
     runs-on: ubuntu-latest
@@ -48,4 +48,4 @@ jobs:
         with:
           app-name: loginpage-backend-qa
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_QA }}
-          package: '*.jar'
+          package: 'demo-project1-loginpage/build/libs/loginpage-backend.jar'
