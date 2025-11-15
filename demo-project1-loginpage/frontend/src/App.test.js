@@ -1,8 +1,16 @@
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+jest.mock('./services/auth.service', () => ({
+    __esModule: true,
+    default: {
+        register: jest.fn(),
+        login: jest.fn(),
+        deleteUser: jest.fn(),
+    },
+}));
+
+test('muestra la pagina de inicio por defecto', () => {
+    render(<App />);
+    expect(screen.getByRole('heading', { name: /Gestiona tu cuenta con facilidad y seguridad/i })).toBeInTheDocument();
 });
