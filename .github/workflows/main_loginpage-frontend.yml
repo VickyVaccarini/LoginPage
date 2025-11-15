@@ -1,0 +1,74 @@
+name: Build and Deploy React App to Azure Web App - loginpage-frontend-qa
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build React app
+        working-directory: frontend
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: react-app
+          path: frontend/build
+
+  deploy_qa:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: react-app
+
+      - name: Deploy to Azure Web App (QA)
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: loginpage-frontend-qa
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_FRONT_QA }}
+          package: .
+
+#PROD
+  deploy_prod:
+    runs-on: ubuntu-latest
+    needs: deploy_qa
+    environment:
+      name: production
+      url: https://loginpage-frontend-prod.azurewebsites.net
+    steps:
+      - name: Manual approval before production
+        uses: trstringer/manual-approval@v1
+        with:
+          approvers: VickyVaccarini
+          instructions: "Aprobar para desplegar el FRONTEND en producción."
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: react-app
+
+      - name: Deploy to Azure Web App (PROD)
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: loginpage-frontend-prod
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_FRONT_PROD }}
+          package: .
