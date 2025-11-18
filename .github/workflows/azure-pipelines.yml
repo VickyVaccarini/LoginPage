@@ -1,0 +1,186 @@
+trigger:
+  - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  ConnectedServiceName: 'ServiceConnectionARM'
+
+  # -------------------------
+  # App Services Backend
+  # -------------------------
+  WebAppBackendQA: 'loginpage-backend-qa'
+  WebAppBackendProd: 'loginpage-backend-prod'
+
+  # -------------------------
+  # App Services Frontend
+  # -------------------------
+  WebAppFrontendQA: 'loginpage-frontend-qa'
+  WebAppFrontendProd: 'loginpage-frontend-prod'
+
+# ===================================================
+#   STAGE 1 — BUILD BACKEND + FRONTEND
+# ===================================================
+stages:
+  - stage: Build
+    displayName: "Build Backend & Frontend"
+    jobs:
+      # ------------------------ BACKEND ------------------------
+      - job: BuildBackend
+        displayName: "Backend - Build Gradle"
+        steps:
+          - checkout: self
+
+          - task: Bash@3
+            displayName: 'Dar permisos a gradlew'
+            inputs:
+              targetType: inline
+              script: chmod +x demo-project1-loginpage/gradlew
+
+          - task: Bash@3
+            displayName: "Build Backend con Gradle"
+            inputs:
+              targetType: inline
+              script: |
+                cd demo-project1-loginpage
+                ./gradlew clean bootJar -x test
+
+          - task: PublishBuildArtifacts@1
+            displayName: "Publicar JAR"
+            inputs:
+              PathtoPublish: 'demo-project1-loginpage/build/libs'
+              ArtifactName: 'backend-jar'
+
+      # ------------------------ FRONTEND ------------------------
+      - job: BuildFrontend
+        displayName: "Frontend - Build React"
+        steps:
+          - checkout: self
+
+          - task: NodeTool@0
+            displayName: "Set up Node 20"
+            inputs:
+              versionSpec: '20.x'
+
+          - script: |
+              cd demo-project1-loginpage/frontend
+              npm ci
+            displayName: "Instalar dependencias"
+
+          - script: |
+              cd demo-project1-loginpage/frontend
+              CI=false npm run build
+            displayName: "Build React"
+
+          - task: PublishBuildArtifacts@1
+            displayName: "Publicar Build del Frontend"
+            inputs:
+              PathtoPublish: 'demo-project1-loginpage/frontend/build'
+              ArtifactName: 'frontend-build'
+
+# ===================================================
+#   STAGE 2 — DEPLOY EN QA (BACK & FRONT)
+# ===================================================
+  - stage: DeployQA
+    displayName: "Deploy QA"
+    dependsOn: Build
+    jobs:
+
+      # ------------------------ BACKEND ------------------------
+      - job: DeployBackendQA
+        displayName: "Deploy Backend QA"
+        steps:
+          - task: DownloadBuildArtifacts@1
+            inputs:
+              artifactName: 'backend-jar'
+              downloadPath: '$(Pipeline.Workspace)'
+
+          - task: AzureWebApp@1
+            displayName: "Deploy Backend QA"
+            inputs:
+              azureSubscription: '$(ConnectedServiceName)'
+              appName: '$(WebAppBackendQA)'
+              package: '$(Pipeline.Workspace)/backend-jar/loginpage-backend.jar'
+
+      # ------------------------ FRONTEND ------------------------
+      - job: DeployFrontendQA
+        displayName: "Deploy Frontend QA"
+        steps:
+          - task: DownloadBuildArtifacts@1
+            inputs:
+              artifactName: 'frontend-build'
+              downloadPath: '$(Pipeline.Workspace)'
+
+          - task: AzureWebApp@1
+            displayName: "Deploy Frontend QA"
+            inputs:
+              azureSubscription: '$(ConnectedServiceName)'
+              appName: '$(WebAppFrontendQA)'
+              package: '$(Pipeline.Workspace)/frontend-build'
+
+# ===================================================
+#   STAGE 3 — APROBACIÓN MANUAL
+# ===================================================
+  - stage: ManualApproval
+    displayName: "Aprobación Manual para Prod"
+    dependsOn: DeployQA
+    jobs:
+      - job: WaitForApproval
+        displayName: "Esperando aprobación…"
+        pool: server
+        steps:
+          - task: ManualValidation@0
+            inputs:
+              instructions: "Aprobar despliegue a Producción."
+              onTimeout: 'reject'
+              timeout: '43200'   # 12 horas
+
+# ===================================================
+#   STAGE 4 — DEPLOY A PROD (BACK & FRONT)
+# ===================================================
+  - stage: DeployProd
+    displayName: "Deploy Producción"
+    dependsOn: ManualApproval
+    condition: succeeded()
+    jobs:
+
+      # ------------------------ BACKEND ------------------------
+      - deployment: DeployBackendProd
+        displayName: "Backend a Producción"
+        environment: 'production'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: DownloadBuildArtifacts@1
+                  inputs:
+                    artifactName: 'backend-jar'
+                    downloadPath: '$(Pipeline.Workspace)'
+
+                - task: AzureWebApp@1
+                  displayName: "Deploy Backend PROD"
+                  inputs:
+                    azureSubscription: '$(ConnectedServiceName)'
+                    appName: '$(WebAppBackendProd)'
+                    package: '$(Pipeline.Workspace)/backend-jar/loginpage-backend.jar'
+
+      # ------------------------ FRONTEND ------------------------
+      - deployment: DeployFrontendProd
+        displayName: "Frontend a Producción"
+        environment: 'production'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: DownloadBuildArtifacts@1
+                  inputs:
+                    artifactName: 'frontend-build'
+                    downloadPath: '$(Pipeline.Workspace)'
+
+                - task: AzureWebApp@1
+                  displayName: "Deploy Frontend PROD"
+                  inputs:
+                    azureSubscription: '$(ConnectedServiceName)'
+                    appName: '$(WebAppFrontendProd)'
+                    package: '$(Pipeline.Workspace)/frontend-build'
