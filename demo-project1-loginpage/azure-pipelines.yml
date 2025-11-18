@@ -4,19 +4,23 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-# ===========================================
-# VARIABLES (group)
-# ===========================================
 variables:
 - group: loginpage-backend-settings
 
-  ConnectedServiceName: 'ServiceConnectionARM'
+- name: ConnectedServiceName
+  value: 'ServiceConnectionARM'
 
-  WebAppBackendQA: 'loginpage-backend-qa'
-  WebAppBackendProd: 'loginpage-backend-prod'
+- name: WebAppBackendQA
+  value: 'loginpage-backend-qa'
 
-  WebAppFrontendQA: 'loginpage-frontend-qa'
-  WebAppFrontendProd: 'loginpage-frontend-prod'
+- name: WebAppBackendProd
+  value: 'loginpage-backend-prod'
+
+- name: WebAppFrontendQA
+  value: 'loginpage-frontend-qa'
+
+- name: WebAppFrontendProd
+  value: 'loginpage-frontend-prod'
 
 # ===================================================
 #   STAGE 1 — BUILD BACKEND + FRONTEND
