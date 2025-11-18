@@ -92,16 +92,16 @@ stages:
               artifactName: 'backend-jar'
               downloadPath: '$(Pipeline.Workspace)'
 
-      - task: AzureWebApp@1
-        displayName: "Deploy Backend QA"
-        inputs:
-          azureSubscription: '$(ConnectedServiceName)'
-          appName: '$(WebAppBackendQA)'
-          package: '$(Pipeline.Workspace)/backend-jar/loginpage-backend.jar'
-          appSettings: >
-            SPRING_DATASOURCE_URL=$(SPRING_DATASOURCE_URL);
-            SPRING_DATASOURCE_USERNAME=$(SPRING_DATASOURCE_USERNAME);
-            SPRING_DATASOURCE_PASSWORD=$(SPRING_DATASOURCE_PASSWORD);
+          - task: AzureWebApp@1
+            displayName: "Deploy Backend QA"
+            inputs:
+              azureSubscription: '$(ConnectedServiceName)'
+              appName: '$(WebAppBackendQA)'
+              package: '$(Pipeline.Workspace)/backend-jar/loginpage-backend.jar'
+              appSettings: >
+                SPRING_DATASOURCE_URL=$(SPRING_DATASOURCE_URL);
+                SPRING_DATASOURCE_USERNAME=$(SPRING_DATASOURCE_USERNAME);
+                SPRING_DATASOURCE_PASSWORD=$(SPRING_DATASOURCE_PASSWORD);
 
       # -------- FRONTEND QA --------
       - job: DeployFrontendQA
