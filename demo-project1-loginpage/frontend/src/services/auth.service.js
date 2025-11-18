@@ -1,14 +1,15 @@
 import axios from 'axios';
 
-const hostToApiUrl = {
-    'loginpage-frontend-qa.azurewebsites.net': 'https://loginpage-backend-qa.azurewebsites.net/api',
-    'loginpage-frontend-prod.azurewebsites.net': 'https://loginpage-backend-prod.azurewebsites.net/api',
-};
+const hostPatterns = [
+    { includes: 'loginpage-frontend-qa', api: 'https://loginpage-backend-qa.azurewebsites.net/api' },
+    { includes: 'loginpage-frontend-prod', api: 'https://loginpage-backend-prod.azurewebsites.net/api' },
+];
 
 const runtimeHost = typeof window !== 'undefined' ? window.location.hostname : '';
+const matchedHost = hostPatterns.find(({ includes }) => runtimeHost.includes(includes));
 const API_URL =
     process.env.REACT_APP_API_URL ??
-    hostToApiUrl[runtimeHost] ??
+    matchedHost?.api ??
     'http://localhost:8080/api';
 
 class AuthService {
