@@ -113,12 +113,12 @@ stages:
               artifactName: 'frontend-build'
               downloadPath: '$(Pipeline.Workspace)'
 
-          - task: AzureWebApp@1
-            displayName: "Deploy Frontend QA"
-            inputs:
-              azureSubscription: '$(ConnectedServiceName)'
-              appName: '$(WebAppFrontendQA)'
-              package: '$(Pipeline.Workspace)/frontend-build'
+      - task: AzureWebApp@1
+        displayName: "Deploy Frontend QA"
+        inputs:
+          azureSubscription: '$(ConnectedServiceName)'
+          appName: '$(WebAppFrontendQA)'
+          package: '$(Pipeline.Workspace)/frontend-build'
 
 # ===================================================
 #   STAGE 3 — APROBACIÓN MANUAL
@@ -185,3 +185,4 @@ stages:
                     azureSubscription: '$(ConnectedServiceName)'
                     appName: '$(WebAppFrontendProd)'
                     package: '$(Pipeline.Workspace)/frontend-build'
+
