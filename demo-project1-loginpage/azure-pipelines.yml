@@ -7,15 +7,9 @@ pool:
 variables:
   ConnectedServiceName: 'ServiceConnectionARM'
 
-  # ------------------------
-  # App Services Backend
-  # -------------------------
   WebAppBackendQA: 'loginpage-backend-qa'
   WebAppBackendProd: 'loginpage-backend-prod'
 
-  # -------------------------
-  # App Services Frontend
-  # -------------------------
   WebAppFrontendQA: 'loginpage-frontend-qa'
   WebAppFrontendProd: 'loginpage-frontend-prod'
 
@@ -27,20 +21,20 @@ stages:
     displayName: "Build Backend & Frontend"
     jobs:
 
-      # ------------------------ BACKEND ------------------------
+      # -------- BACKEND --------
       - job: BuildBackend
         displayName: "Backend - Build Gradle"
         steps:
           - checkout: self
 
           - task: Bash@3
-            displayName: 'Dar permisos a gradlew'
+            displayName: "Dar permisos a gradlew"
             inputs:
               targetType: inline
               script: chmod +x demo-project1-loginpage/gradlew
 
           - task: Bash@3
-            displayName: "Build Backend con Gradle"
+            displayName: "Build Backend"
             inputs:
               targetType: inline
               script: |
@@ -50,10 +44,10 @@ stages:
           - task: PublishBuildArtifacts@1
             displayName: "Publicar JAR"
             inputs:
-              PathtoPublish: '$(Build.SourcesDirectory)/demo-project1-loginpage/build/libs'
+              PathtoPublish: 'demo-project1-loginpage/build/libs'
               ArtifactName: 'backend-jar'
 
-      # ------------------------ FRONTEND ------------------------
+      # -------- FRONTEND --------
       - job: BuildFrontend
         displayName: "Frontend - Build React"
         steps:
@@ -77,18 +71,18 @@ stages:
           - task: PublishBuildArtifacts@1
             displayName: "Publicar Build del Frontend"
             inputs:
-              PathtoPublish: '$(Build.SourcesDirectory)/demo-project1-loginpage/frontend/build'
+              PathtoPublish: 'demo-project1-loginpage/frontend/build'
               ArtifactName: 'frontend-build'
 
 # ===================================================
-#   STAGE 2 — DEPLOY EN QA (BACK & FRONT)
+#   STAGE 2 — DEPLOY QA
 # ===================================================
   - stage: DeployQA
     displayName: "Deploy QA"
     dependsOn: Build
     jobs:
 
-      # ------------------------ BACKEND ------------------------
+      # -------- BACKEND QA --------
       - job: DeployBackendQA
         displayName: "Deploy Backend QA"
         steps:
@@ -104,7 +98,7 @@ stages:
               appName: '$(WebAppBackendQA)'
               package: '$(Pipeline.Workspace)/backend-jar/loginpage-backend.jar'
 
-      # ------------------------ FRONTEND ------------------------
+      # -------- FRONTEND QA --------
       - job: DeployFrontendQA
         displayName: "Deploy Frontend QA"
         steps:
@@ -113,12 +107,12 @@ stages:
               artifactName: 'frontend-build'
               downloadPath: '$(Pipeline.Workspace)'
 
-      - task: AzureWebApp@1
-        displayName: "Deploy Frontend QA"
-        inputs:
-          azureSubscription: '$(ConnectedServiceName)'
-          appName: '$(WebAppFrontendQA)'
-          package: '$(Pipeline.Workspace)/frontend-build'
+          - task: AzureWebApp@1
+            displayName: "Deploy Frontend QA"
+            inputs:
+              azureSubscription: '$(ConnectedServiceName)'
+              appName: '$(WebAppFrontendQA)'
+              package: '$(Pipeline.Workspace)/frontend-build'
 
 # ===================================================
 #   STAGE 3 — APROBACIÓN MANUAL
@@ -135,10 +129,10 @@ stages:
             inputs:
               instructions: "Aprobar despliegue a Producción."
               onTimeout: 'reject'
-              timeout: '43200'
+              timeout: '43200'   # 12 horas
 
 # ===================================================
-#   STAGE 4 — DEPLOY A PROD (BACK & FRONT)
+#   STAGE 4 — DEPLOY PROD
 # ===================================================
   - stage: DeployProd
     displayName: "Deploy Producción"
@@ -146,9 +140,9 @@ stages:
     condition: succeeded()
     jobs:
 
-      # ------------------------ BACKEND ------------------------
+      # -------- BACKEND PROD --------
       - deployment: DeployBackendProd
-        displayName: "Backend a Producción"
+        displayName: "Backend Producción"
         environment: 'production'
         strategy:
           runOnce:
@@ -166,9 +160,9 @@ stages:
                     appName: '$(WebAppBackendProd)'
                     package: '$(Pipeline.Workspace)/backend-jar/loginpage-backend.jar'
 
-      # ------------------------ FRONTEND ------------------------
+      # -------- FRONTEND PROD --------
       - deployment: DeployFrontendProd
-        displayName: "Frontend a Producción"
+        displayName: "Frontend Producción"
         environment: 'production'
         strategy:
           runOnce:
@@ -185,4 +179,3 @@ stages:
                     azureSubscription: '$(ConnectedServiceName)'
                     appName: '$(WebAppFrontendProd)'
                     package: '$(Pipeline.Workspace)/frontend-build'
-
