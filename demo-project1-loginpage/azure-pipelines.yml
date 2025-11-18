@@ -86,6 +86,7 @@ stages:
       - job: DeployBackendQA
         displayName: "Deploy Backend QA"
         steps:
+
           - task: DownloadBuildArtifacts@1
             inputs:
               artifactName: 'backend-jar'
@@ -106,6 +107,7 @@ stages:
       - job: DeployFrontendQA
         displayName: "Deploy Frontend QA"
         steps:
+
           - task: DownloadBuildArtifacts@1
             inputs:
               artifactName: 'frontend-build'
