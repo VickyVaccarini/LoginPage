@@ -7,7 +7,7 @@ pool:
 variables:
   ConnectedServiceName: 'ServiceConnectionARM'
 
-  # -------------------------
+  # ------------------------
   # App Services Backend
   # -------------------------
   WebAppBackendQA: 'loginpage-backend-qa'
