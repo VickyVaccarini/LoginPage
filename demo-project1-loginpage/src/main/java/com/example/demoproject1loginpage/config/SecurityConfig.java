@@ -22,12 +22,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/api/**").permitAll()
-                .antMatchers("/h2-console/**").permitAll()
-                .anyRequest().authenticated()
-                .and().httpBasic()
-                .and().csrf().disable()
-                .headers().frameOptions().disable();
+                .anyRequest()
+                .permitAll()
+                .and()
+                .csrf()
+                .disable();
     }
 
     @Bean
