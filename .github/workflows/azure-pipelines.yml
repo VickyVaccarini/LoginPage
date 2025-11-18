@@ -26,6 +26,7 @@ stages:
   - stage: Build
     displayName: "Build Backend & Frontend"
     jobs:
+
       # ------------------------ BACKEND ------------------------
       - job: BuildBackend
         displayName: "Backend - Build Gradle"
