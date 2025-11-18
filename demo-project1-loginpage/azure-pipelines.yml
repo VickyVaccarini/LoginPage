@@ -107,10 +107,12 @@ stages:
               azureSubscription: '$(ConnectedServiceName)'
               appName: '$(WebAppBackendQA)'
               package: '$(Pipeline.Workspace)/backend-jar/loginpage-backend.jar'
-              appSettings: >
-                SPRING_DATASOURCE_URL=$(SPRING_DATASOURCE_URL);
-                SPRING_DATASOURCE_USERNAME=$(SPRING_DATASOURCE_USERNAME);
-                SPRING_DATASOURCE_PASSWORD=$(SPRING_DATASOURCE_PASSWORD);
+              appSettings: |
+                [
+                  {"name": "SPRING_DATASOURCE_URL", "value": "$(SPRING_DATASOURCE_URL)"},
+                  {"name": "SPRING_DATASOURCE_USERNAME", "value": "$(SPRING_DATASOURCE_USERNAME)"},
+                  {"name": "SPRING_DATASOURCE_PASSWORD", "value": "$(SPRING_DATASOURCE_PASSWORD)"}
+                ]
 
       # -------- FRONTEND QA --------
       - job: DeployFrontendQA
@@ -174,10 +176,13 @@ stages:
                     azureSubscription: '$(ConnectedServiceName)'
                     appName: '$(WebAppBackendProd)'
                     package: '$(Pipeline.Workspace)/backend-jar/loginpage-backend.jar'
-                    appSettings: >
-                      SPRING_DATASOURCE_URL=$(SPRING_DATASOURCE_URL);
-                      SPRING_DATASOURCE_USERNAME=$(SPRING_DATASOURCE_USERNAME);
-                      SPRING_DATASOURCE_PASSWORD=$(SPRING_DATASOURCE_PASSWORD);
+                    appSettings: |
+                      [
+                        {"name": "SPRING_DATASOURCE_URL", "value": "$(SPRING_DATASOURCE_URL)"},
+                        {"name": "SPRING_DATASOURCE_USERNAME", "value": "$(SPRING_DATASOURCE_USERNAME)"},
+                        {"name": "SPRING_DATASOURCE_PASSWORD", "value": "$(SPRING_DATASOURCE_PASSWORD)"}
+                      ]
+
 
       # -------- FRONTEND PROD --------
       - deployment: DeployFrontendProd
