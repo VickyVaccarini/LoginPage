@@ -4,7 +4,12 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
+# ===========================================
+# VARIABLES (group)
+# ===========================================
 variables:
+- group: loginpage-backend-settings
+
   ConnectedServiceName: 'ServiceConnectionARM'
 
   WebAppBackendQA: 'loginpage-backend-qa'
