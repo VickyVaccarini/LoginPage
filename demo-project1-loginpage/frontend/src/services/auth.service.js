@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const hostPatterns = [
-    { includes: 'loginpage-frontend-qa', api: 'https://loginpage-backend-qa.azurewebsites.net/api' },
-    { includes: 'loginpage-frontend-prod', api: 'https://loginpage-backend-prod.azurewebsites.net/api' },
+  { includes: 'loginpage-frontend-qa',   api: 'https://loginpage-backend-qa-arczbfdkbrf7bdg2.brazilsouth-01.azurewebsites.net/api' },
+  { includes: 'loginpage-frontend-prod', api: 'https://loginpage-backend-prod-ffdmg4bwfjatg0bd.brazilsouth-01.azurewebsites.net/api' },
 ];
 
 const runtimeHost = typeof window !== 'undefined' ? window.location.hostname : '';
