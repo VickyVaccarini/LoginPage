@@ -5,8 +5,6 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-- group: loginpage-backend-settings
-
 - name: ConnectedServiceName
   value: 'ServiceConnectionARM'
 
@@ -89,6 +87,8 @@ stages:
   - stage: DeployQA
     displayName: "Deploy QA"
     dependsOn: Build
+    variables:
+      - group: loginpage-backend-qa-settings
     jobs:
 
       # -------- BACKEND QA --------
@@ -156,6 +156,8 @@ stages:
     displayName: "Deploy Producción"
     dependsOn: ManualApproval
     condition: succeeded()
+    variables:
+      - group: loginpage-backend-prod-settings
     jobs:
 
       # -------- BACKEND PROD --------
