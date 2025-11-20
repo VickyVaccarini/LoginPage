@@ -20,7 +20,7 @@ public class DemoProject1LoginpageApplication {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000") // Replace this with the origin of your frontend app
+                        .allowedOriginPatterns("http://localhost:*", "https://*.azurewebsites.net")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
